@@ -1,0 +1,99 @@
+let container = document.querySelector("#container")
+let range = document.querySelector("#slider")
+update()
+function convert(value){
+    return (100/range.value)*value
+
+}
+function update(){
+    container.innerHTML = ""
+    // value.innerHTML = range.value
+    // console.log(range.value)
+    for(let i = 0;i<range.value;i++){
+        let barContainer = document.createElement("div")
+        barContainer.classList.add("bar-container")
+        let bar = document.createElement("div")
+        bar.classList.add("bar")
+        bar.style.height = convert(i)+"%"
+        barContainer.appendChild(bar)
+        container.appendChild(barContainer)
+    }
+}
+function swap(con1,con2){
+    let tmp = con1.innerHTML
+    con1.innerHTML = con2.innerHTML
+    con2.innerHTML = tmp
+}
+function shuffle(){
+    let barContainers = document.querySelectorAll(".bar-container")
+    barContainers.forEach((element,index)=>{
+        let randomIndex = index+Math.floor(Math.random()*(barContainers.length-index));
+        swap(barContainers[randomIndex],element)
+    })
+}
+
+function sort(barContainers){
+    let res = []
+    let array = []
+    barContainers.forEach((element)=>{array.push(parseInt(element.querySelector(".bar").style.height))})
+    console.log(array)
+    for(let i = 0;i<array.length;i++){
+        let present = i
+        for(let j = i;j<array.length;j++){
+            res.push({"src":i,"dest":j,"type":"comp"})
+            if(array[present] > array[j]){
+                // console.log(present.querySelector(".bar").style.height+" is greater than "+ barContainers[j].querySelector(".bar").style.height)
+                present = j
+            }
+        }
+        // console.log(i)
+        res.push({"src":i,"dest":present,"type":"swap"})
+        let tmp = array[i]
+        array[i] = array[present]
+        array[present] = tmp
+        // swap(array[i],array[present])
+    }
+    console.log(array)
+    return res
+}
+async function display(){
+    let barContainers = document.querySelectorAll(".bar-container")
+    let moves = sort(barContainers)
+    
+    async function upgrade(){
+            let data = moves.shift()
+            if(data.type==="swap"){
+                swap(barContainers[data.src],barContainers[data.dest])
+                barContainers[data.src].querySelector(".bar").style.backgroundColor = "yellow"
+                barContainers[data.dest].querySelector(".bar").style.backgroundColor = "red"
+                let promis = new Promise((resolve,reject)=>{
+                    setTimeout(() =>resolve("done!"), 250);
+                })
+                return promis
+            }
+            else if(data.type==="comp"){
+                barContainers[data.src].querySelector(".bar").style.backgroundColor = "yellow"
+                barContainers[data.dest].querySelector(".bar").style.backgroundColor = "red"
+                let promis = new Promise((resolve,reject)=>{
+                    setTimeout(() =>resolve("done!"), 150);
+                })
+                return promis
+                // barContainers[data.src].querySelector(".bar").style.backgroundColor = "blue"
+                // barContainers[data.dest].querySelector(".bar").style.backgroundColor = "blue"
+                // return Promise((resolve,reject)=>{
+                //     resolve
+                // })
+            }
+            else{
+            }
+        }
+    let siz = moves.length
+    for(let i = 0;i<siz;i++){
+        console.log("Hello")
+        let promis = new Promise((resolve,reject)=>{
+            setTimeout(() =>resolve("done!"), 250);
+        })
+        let value = await promis
+        await upgrade()
+    }
+}
